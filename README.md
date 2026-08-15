@@ -1,74 +1,116 @@
-# Bobby Research OS v1.0
+# FAIR Universe 2026 — Weak Lensing OoD Detection
 
-A traceability-first operating system for independent, AI-assisted frontier research.
+**Independent, AI-assisted research. Not peer reviewed.**
 
-> **Question -> Evidence -> Hypothesis -> Adversarial Tests -> Computation -> Falsification -> Replication -> Artifact**
+This repository is the first externally scored implementation of **Bobby Research OS v1.0**. It targets the **NeurIPS 2026 FAIR Universe Weak Lensing ML Uncertainty Challenge — Phase 2**, an out-of-distribution (OoD) detection benchmark for weak-lensing cosmology.
 
-## Purpose
+> **Question -> Evidence -> Hypothesis -> Adversarial Tests -> Computation -> Falsification -> Replication -> External Score**
 
-Bobby Research OS is designed to answer a simple question: **how much credible scientific work can one independent human produce when frontier AI is treated as cognitive infrastructure rather than an authority?**
+## Challenge objective
 
-The objective is not maximum output. It is maximum trustworthy information produced per researcher.
+Given a weak-lensing convergence map `x`, produce a continuous anomaly score `t(x)` such that larger values indicate greater confidence that the map was generated outside the training distribution.
 
-## Core rule
+The organizers do **not** provide OoD examples or reveal the hidden OoD generative process. The project therefore focuses on robust detection of simulation/model mismatch rather than supervised classification of known anomalies.
 
-**AI proposes. Deterministic systems verify. Evidence remains traceable.**
+## Official Phase 2 metric
 
-Every serious project should end with three layers:
+The leaderboard score is the mean true-positive rate evaluated at **100 logarithmically spaced false-positive rates from 0.001 to 0.05**:
 
-1. **Executive decision output** — what did we learn and what should happen next?
-2. **Technical evidence** — why should anyone believe the conclusion?
-3. **Reproducible repository** — can another competent researcher regenerate and interrogate the result?
+`score = mean_i TPR(FPR_i)`
 
-## Start a project
+This means performance in the extreme low-FPR tail matters much more than a generic full-range ROC-AUC.
 
-1. Copy this repository as a GitHub template.
-2. Fill in `research_question.md`.
-3. Pre-specify decisive tests in `preregistration.md` before inspecting the decisive result.
-4. Register sources and claims in `evidence/`.
-5. Assign every consequential analysis an experiment ID in `experiments/registry.csv`.
-6. Run the adversarial test suite and record attempts to kill the result.
-7. Package the final decision memo, technical report, limitations, and reproducibility statement.
-8. Make the central result regenerable with `make reproduce` or `./reproduce.sh`.
+## Dataset
+
+The official training set contains weak-lensing convergence maps designed to mimic HSC Y3 observations:
+
+- 101 spatially flat LCDM cosmologies spanning `(Omega_m, S8)`
+- 256 realizations per cosmology
+- map shape: `1424 x 176`
+- 2 arcmin pixel resolution
+- nuisance/systematic variation includes baryonic feedback and photometric-redshift uncertainty
+- training samples are InD; Phase 2 test data contain an undisclosed subset generated under different physical assumptions
+
+## Published baseline scores
+
+The challenge white paper reports these Phase 2 public-test scores:
+
+| Baseline | Score |
+|---|---:|
+| Power spectrum + chi-squared / p-value | **0.2143** |
+| Autoencoder reconstruction error | **0.1307** |
+| CNN summary + chi-squared / p-value | **0.1053** |
+| Random score | **0.0128** |
+
+Our first hard target is to reproduce an official baseline end-to-end. Only after that do we optimize.
+
+## Research question
+
+> Can a traceable, AI-assisted independent research pipeline develop an OoD detector for weak-lensing maps that robustly exceeds the strongest published FAIR Universe Phase 2 baseline under the official low-FPR metric and survives local adversarial validation?
+
+See [`research_question.md`](research_question.md) and [`preregistration.md`](preregistration.md).
+
+## Experimental program
+
+The initial sequence is deliberately conservative:
+
+1. **EXP-001 — Official power-spectrum baseline reproduction**
+2. **EXP-002 — Frozen local validation and metric reproduction**
+3. **EXP-003 — Power-spectrum residual / covariance variants**
+4. **EXP-004 — Non-Gaussian hand-engineered statistics**
+5. **EXP-005 — Learned representation-distance detector**
+6. **EXP-006 — Synthetic-shift / self-supervised OoD training**
+7. **EXP-007 — Low-FPR calibration and tail optimization**
+8. **EXP-008 — Diversity-gated ensemble**
+
+An experiment advances because it beats the frozen validation baseline, not because it sounds promising.
+
+## Validation rules
+
+- Keep the official baseline implementation reproducible and separate from experimental code.
+- Freeze a local validation protocol before using leaderboard feedback for model selection.
+- Treat Codabench submissions as scarce external measurements, not a hyperparameter oracle.
+- Track every submission in `submissions/registry.csv`.
+- Preserve failed experiments and negative results.
+- Report performance at the official FPR grid and also inspect per-FPR behavior.
+- No claim of improvement is accepted without seed/ablation checks appropriate to the method.
 
 ## Repository map
 
-- `RESEARCH_CONSTITUTION.md` — non-negotiable epistemic rules
-- `research_question.md` — falsifiable question, metric, success and failure criteria
-- `preregistration.md` — pre-specified tests and post-hoc boundary
-- `assumptions.yaml` — explicit versioned assumptions
-- `AI_USAGE.md` — disclosure of AI involvement and verification
+- `challenge/CHALLENGE_SPEC.md` — source-grounded task specification
+- `research_question.md` — falsifiable research question and decision criteria
+- `preregistration.md` — pre-specified working research record
+- `assumptions.yaml` — explicit assumptions and sensitivity tests
 - `evidence/` — source, claim, and contradiction registries
-- `experiments/` — experiment registry and per-experiment records
-- `reports/` — executive, technical, limitations, reproducibility outputs
-- `tests/` — automated integrity/reproduction tests
-- `src/` — deterministic analysis code
-- `outputs/` — generated figures, tables, logs, and models
-- `reproduce.sh` / `Makefile` — one-command reproduction entry point
+- `experiments/registry.csv` — experiment ledger
+- `submissions/registry.csv` — external leaderboard measurements
+- `src/metrics/phase2.py` — local implementation of the Phase 2 score
+- `tests/` — integrity and metric tests
+- `reports/` — executive, technical, limitations, and reproducibility outputs
+- `RESEARCH_CONSTITUTION.md` — epistemic rules inherited from Bobby Research OS
 
-## Validation ladder
+## Upstream sources
 
-0. Observation
-1. Internal reproduction
-2. Robustness
-3. Null calibration
-4. Independent implementation
-5. External benchmark
-6. Independent replication
-7. Formal scientific validation
+Authoritative challenge material lives upstream at:
 
-Claims should be written at the level actually earned.
+- FAIR Universe challenge site
+- FAIR Universe `Cosmology_Challenge` GitHub repository
+- challenge white paper, arXiv:2604.14451
+- Phase 2 Codabench competition
 
-## Public disclosure
+The upstream repository is pinned for reproducibility in [`upstream/README.md`](upstream/README.md).
 
-Recommended label for public work:
+## Reproduction
 
-> **Independent, AI-assisted research. Not peer reviewed unless explicitly stated otherwise.**
+For repository-level checks:
 
-## First externally scored implementation
+```bash
+make test
+make reproduce
+```
 
-The intended first instantiation is **`fair-universe-2026`**, targeting the NeurIPS 2026 FAIR Universe Weak Lensing Uncertainty Challenge Phase 2.
+The official starting-kit notebooks and competition data remain upstream and are not vendored here. The first operational milestone is to reproduce the official power-spectrum Phase 2 baseline and record the first valid Codabench score.
 
-## Status
+## Current status
 
-**v1.0 — active development**
+**BASELINE** — repository specialized; official baseline execution and first scored submission are the next decisive actions.
