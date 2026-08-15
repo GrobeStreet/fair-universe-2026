@@ -1,11 +1,31 @@
 project:
-  status: SCOPING
+  name: fair-universe-2026
+  status: BASELINE
   ai_assisted: true
   peer_reviewed: false
+  external_benchmark: FAIR Universe Weak Lensing ML Uncertainty Challenge Phase 2
 
 assumptions:
   - id: A001
-    statement: "REPLACE_ME"
-    rationale: "REPLACE_ME"
-    sensitivity_test: "REPLACE_ME"
+    statement: "The official white paper metric and organizer starting kits define the benchmark we must reproduce before optimization."
+    rationale: "External scoring only has meaning if our local implementation matches the organizer specification."
+    sensitivity_test: "Compare local metric behavior and baseline workflow against the official starting kit and first valid Codabench result."
+    status: active
+
+  - id: A002
+    statement: "Nuisance/systematic variation represented in the official training set is InD variation and should not itself be treated as OoD."
+    rationale: "The challenge explicitly samples baryonic and photometric-redshift nuisance parameters in training for marginalization."
+    sensitivity_test: "Stratify local anomaly scores across available nuisance labels and check for spurious separation."
+    status: active
+
+  - id: A003
+    statement: "Leaderboard feedback is an external measurement, not a development set."
+    rationale: "Adaptive probing can overfit a public leaderboard even without access to hidden labels."
+    sensitivity_test: "Require locally justified changes and maintain a complete submission registry."
+    status: active
+
+  - id: A004
+    statement: "Synthetic OoD generators used locally are proxies for robustness, not estimates of the organizer's hidden OoD process."
+    rationale: "The organizers intentionally withhold the hidden OoD generative process."
+    sensitivity_test: "Hold out entire synthetic-shift families and reject gains that do not transfer."
     status: active
