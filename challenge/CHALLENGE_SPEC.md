@@ -18,6 +18,12 @@ with `N = 100` and `FPR_i` logarithmically spaced between `0.001` and `0.05`.
 
 The metric emphasizes detection power at low false-positive rates. Full ROC-AUC is therefore secondary and must not be substituted for the official metric.
 
+## Current organizer execution state
+
+- Current organizer execution pin used by this repository: `f5def09c024071f50e1cfe537b39245550e3666d` (2026-08-17).
+- The original launch pin `4cebdff5dda220994263379df13ce801cfddb8fe` is retained only as historical provenance.
+- The organizer changed the Phase 2 notebooks, data/evaluation pages, and scoring code after launch.
+
 ## Training data facts
 
 - 101 spatially flat LCDM cosmologies.
@@ -27,6 +33,23 @@ The metric emphasizes detection power at low false-positive rates. Full ROC-AUC 
 - The maps represent the second redshift bin of the HSC Y3 WIDE12H subfield.
 - Baryonic feedback and photometric-redshift uncertainty are sampled as nuisance/systematic effects in the training data.
 - Each sample has a 5D label `(Omega_m, S8, T_AGN, f0, Delta_z)`.
+- The current organizer download contains training plus public test data and is approximately 8.7 GB.
+
+## Current public-test data
+
+The current valid public test file is:
+
+`WIDE12H_bin2_2arcmin_kappa_test_phase2_new_v2.npy`
+
+The organizers replaced the earlier `*_test_phase2_new.npy` dataset on 2026-08-12 after identifying a numerical problem. Submissions based on the earlier test dataset were invalidated and the public leaderboard was reset.
+
+## Critical eligibility rule: sample-independent inference
+
+Every submitted method must evaluate each test sample independently.
+
+The output for one test sample must not depend on the presence, absence, order, or values of any other test sample. The public test set must not be used collectively to fit, train, adapt, cluster, calibrate, normalize, rank, select, estimate densities, construct nearest-neighbor references, compute thresholds, pseudo-label, or otherwise modify the method.
+
+This rules out transductive or test-set aggregation strategies for final ranking/prize eligibility. Any local experimentation in this repository must preserve this boundary.
 
 ## Official Phase 2 baselines
 
@@ -58,14 +81,18 @@ The organizers note that simple neural-network baselines underperform the power-
 3. Compare test reconstruction-error behavior to the training reference distribution.
 4. Convert that extremeness to an OoD score.
 
-## Competition deadline
+## Competition / registration constraints
 
-Phase 2 submissions are open until **October 11, 2026, 23:59 UTC** according to the official challenge site/repository.
+Phase 2 submissions are open until **October 11, 2026, 23:59 UTC** according to the official challenge repository.
+
+The organizer asks participants to register using an affiliation/institution/company email. Public-domain email registrations may not be approved automatically.
+
+Final rankings are based on a private holdout rerun of packaged methods, so public-test performance is not sufficient by itself.
 
 ## Sources
 
 - FAIR Universe official challenge website
-- FAIR-Universe/Cosmology_Challenge official repository
+- `FAIR-Universe/Cosmology_Challenge` official repository at current execution pin
 - Dai et al., *FAIR Universe Weak Lensing ML Uncertainty Challenge: Handling Uncertainties and Distribution Shifts for Precision Cosmology*, arXiv:2604.14451
 - Phase 2 Codabench competition
 
